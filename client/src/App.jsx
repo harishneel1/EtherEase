@@ -1,9 +1,16 @@
-function App() {
+import { NavBar, Footer, Services, Transactions, Welcome } from "./components";
 
+function App() {
   return (
-    <>
-      <span className={"bg-black"}>Hey</span>
-    </>
+    <div className="min-h-screen">
+      <div className="gradient-bg-welcome">
+        <NavBar/>
+        <Welcome />
+      </div>
+    <Services />
+    <Transactions />
+    <Footer />
+    </div>
   )
 }
 
