@@ -22,22 +22,88 @@ const getEthereumContract = () => {
 
 export const TransactionProvider = ({children}) => {
 
+    const [currentAccount, setCurrectAccount] = useState("");
+
+    const [formData, setFormData] = useState({
+        addressTo: "", 
+        amount: "", 
+        keyword: "", 
+        message: ""
+    })
+
+    const handleChange = (e) => {
+        setFormData((prev) => {
+            return {
+                ...prev, 
+                [e.target.name]: e.target.value
+            }
+        })
+    }
+
     const checkIfWalletIsConnected = async () => {
-        if(!ethereum) return alert("Please install metamask");
 
-        //here we get the metamask connected accounts
-        const accounts = await ethereum.request({method: "eth_accounts"});
+        try {
+            if(!ethereum) return alert("Please install metamask");
+    
+            //here we get the metamask connected accounts
+            const accounts = await ethereum.request({method: "eth_accounts"});
+    
+            if(accounts.length) {
+                setCurrectAccount(accounts[0]);
+    
+                //getAllTransactions()
+    
+            } else {
+                console.log("No accounts found");
+            }
+            console.log(accounts);
 
-        console.log(accounts);
+        } catch(err) {
+            console.log(err);
+
+            throw new Error("No thereium object")
+        }
 
     }
+
+    const connectWallet = async () => {
+        try {
+            if(!ethereum) return alert("Please install metamask");
+
+            const accounts = await ethereum.request({method: "eth_requestAccounts"});
+
+            setCurrectAccount(accounts[0]);
+
+
+        }catch(err) {
+            console.log(err);
+
+            throw new Error("No thereium object")
+        }
+    }
+
+
+    const sendTransaction = async () => {
+        try {
+            if(!ethereum) return alert("Please install metamask");
+
+
+        } catch(err) {
+            console.log(err);
+
+            throw new Error("No thereium object")
+        }
+    }
+
+
+
 
     useEffect(() => {
         checkIfWalletIsConnected();
     }, [])
 
     return (
-        <TransactionContext.Provider value = {{value: "test"}}>
+        <TransactionContext.Provider value = {{connectWallet, currentAccount, formData, setFormData, handleChange, sendTransaction}}>
             {children}
         </TransactionContext.Provider>
     )
