@@ -32,6 +32,8 @@ export const TransactionProvider = ({children}) => {
         message: ""
     })
 
+    const [transactionCount, setTransactionCount] = useState(localStorage.getItem("transactionCount"));
+
     const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e, name, value) => {
@@ -113,14 +115,24 @@ export const TransactionProvider = ({children}) => {
 
             const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmount, message, keyword);
 
+            setIsLoading(true);
+
+            console.log(`Loading - ${transactionHash.hash}`)
+
+            await transactionHash.wait();
+            setIsLoading(false);
+
+            console.log(`Success - ${transactionContract.hash}`)
+
+            const transactionCount = await transactionContract.getTransactionCount();
+
+            setTransactionCount(transactionCount.toNumber());
         } catch(err) {
             console.log(err);
 
             throw new Error("No thereium object")
         }
     }
-
-
 
 
     useEffect(() => {
