@@ -13,6 +13,7 @@ const getEthereumContract = () => {
     const signer = provider.getSigner();
     const transactionContract = new ethers.Contract(contractAddress, contractABI, signer);
 
+    return transactionContract;
     console.log({
         provider, 
         signer, 
@@ -22,7 +23,7 @@ const getEthereumContract = () => {
 
 export const TransactionProvider = ({children}) => {
 
-    const [currentAccount, setCurrectAccount] = useState("");
+    const [currentAccount, setCurrentAccount] = useState("");
 
     const [formData, setFormData] = useState({
         addressTo: "", 
@@ -31,11 +32,15 @@ export const TransactionProvider = ({children}) => {
         message: ""
     })
 
-    const handleChange = (e) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleChange = (e, name, value) => {
+
+
         setFormData((prev) => {
             return {
                 ...prev, 
-                [e.target.name]: e.target.value
+                [name]: value
             }
         })
     }
@@ -49,7 +54,7 @@ export const TransactionProvider = ({children}) => {
             const accounts = await ethereum.request({method: "eth_accounts"});
     
             if(accounts.length) {
-                setCurrectAccount(accounts[0]);
+                setCurrentAccount(accounts[0]);
     
                 //getAllTransactions()
     
@@ -72,7 +77,7 @@ export const TransactionProvider = ({children}) => {
 
             const accounts = await ethereum.request({method: "eth_requestAccounts"});
 
-            setCurrectAccount(accounts[0]);
+            setCurrentAccount(accounts[0]);
 
 
         }catch(err) {
@@ -87,6 +92,26 @@ export const TransactionProvider = ({children}) => {
         try {
             if(!ethereum) return alert("Please install metamask");
 
+            const {addressTo, amount, keyword, message} = formData;
+
+            const transactionContract = getEthereumContract();
+            const parsedAmount = ethers.utils.parseEther(amount);
+
+            await ethereum.request({ 
+                method: "eth_sendTransaction", 
+                params: [{
+                    from: currentAccount,
+                    to: addressTo, 
+                    gas: "0x5248", //2100 GWEI, 
+                    value: parsedAmount._hex,  //0.001
+
+                }]
+             })
+            // here, we get the data from the form
+
+            //to store our transaction
+
+            const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmount, message, keyword);
 
         } catch(err) {
             console.log(err);

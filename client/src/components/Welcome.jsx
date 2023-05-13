@@ -13,7 +13,7 @@ const Input = ({placeholder, name, type, value, handleChange}) => {
             type = {type}
             step = "0.001"
             value = {value}
-            onChange = {(e) => handleChange(e, name)}
+            onChange = {(e) => handleChange(e, name, value)}
             className = "my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
         >
         </input>
@@ -23,16 +23,19 @@ const Input = ({placeholder, name, type, value, handleChange}) => {
 
 const Welcome = () => {
 
-    const {connectWallet, currentAccount, formData, setFormData, handleChange, sendTransaction} = useContext(TransactionContext);
+    const {connectWallet, currentAccount, formData, handleChange, sendTransaction} = useContext(TransactionContext);
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+
         const {addressTo, amount, keyword, message} = formData;
 
         e.preventDefault();
 
         if(!addressTo || !amount || !keyword || !message) {
-            sendTransaction();
+            return
         }
+
+        sendTransaction();
     }
 
     return (
@@ -93,7 +96,7 @@ const Welcome = () => {
                         </div>
                     </div>
                     <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism">
-                        <Input placeholder = "Addess To" name = "addressTo" type = "text" handleChange = {handleChange}  />
+                        <Input placeholder = "Addess To" name = "addressTo" type = "text"  handleChange = {handleChange}  />
                         <Input placeholder = "Amount (ETH)" name = "amount" type = "number" handleChange = {handleChange}  />
                         <Input placeholder = "keyword (Gif)" name = "keyword" type = "text" handleChange = {handleChange}  />
                         <Input placeholder = "Enter Message" name = "message" type = "text" handleChange = {handleChange}  />
@@ -101,7 +104,7 @@ const Welcome = () => {
                         <div className="h-[1px] w-full bg-gray-400 my-2" />
 
                         {
-                            true ? (
+                            false ? (
                                 <Loader />
                             ) : (
                                 <button
